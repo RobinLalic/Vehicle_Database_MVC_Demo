@@ -1,4 +1,4 @@
-﻿@model List<Vehicle_Database_MVC.Models.Domain.VehicleModel>
+﻿@model List<Service.Data.VehicleModelDto>
 
 @{
 }
@@ -24,7 +24,7 @@
                     <td> @vehicle.MakeId</td>
                     <td> @vehicle.VehicleName</td>
                     <td> @vehicle.VehicleAbrv</td>
-                    <td><a href="VehicleModels/View/@vehicle.Id">View</a> </td>
+                    <td><a href="ViewVehicleModel/@vehicle.Id">View</a> </td>
                 </tr>
         }
     </tbody>

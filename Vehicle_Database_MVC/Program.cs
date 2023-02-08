@@ -1,5 +1,7 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Vehicle_Database_MVC.Data;
+using Vehicle_Database_MVC.Helper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,13 @@ builder.Services.AddDbContext<VehicleDbContext>(options=>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("Vehicle_Database_ConnectionString")
         ));
+
+var config = new MapperConfiguration(cfg =>
+{
+    cfg.AddProfile(new AutoMappingProfile());
+});
+var mapper = config.CreateMapper();
+builder.Services.AddSingleton(mapper);
 
 var app = builder.Build();
 

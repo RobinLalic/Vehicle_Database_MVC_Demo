@@ -3,39 +3,52 @@ using Vehicle_Database_MVC.Data;
 using Vehicle_Database_MVC.Models.Domain;
 using Vehicle_Database_MVC.Models;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+using Service.Data;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Vehicle_Database_MVC.Controllers
 {
     public class VehicleModelsController : Controller
     {
         private readonly VehicleDbContext vehicleDbContext;
+        private readonly IMapper _mapper;
 
-        public VehicleModelsController(VehicleDbContext vehicleDbContext)
+        public VehicleModelsController(VehicleDbContext vehicleDbContext, IMapper mapper)
         {
             this.vehicleDbContext = vehicleDbContext;
+            this._mapper = mapper;
         }
         [HttpGet]
         public async Task<IActionResult> IndexVehicleModel()
         {
             var models = await vehicleDbContext.Models.ToListAsync();
-            return View(models);
+            var modelsDto = new List<VehicleModelDto>();
+            if (models.Any())
+            {
+                foreach (var model in models)
+                {
+                    var vehicleModel =
+                      _mapper.Map<VehicleModel, VehicleModelDto>(model);
+                    modelsDto.Add(vehicleModel);
+                }
+            }
+            return View(modelsDto);
         }
         public IActionResult AddVehicleModel()
         {
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> AddVehicleModel(AddVehicleModelViewModel viewModel)
+        public async Task<IActionResult> AddVehicleModel(VehicleModelDto vehicleModel)
         {
-            var vehicle = new VehicleModel()
-            {
-                VehicleName = viewModel.VehicleName,
-                VehicleAbrv = viewModel.VehicleAbrv
-            };
+            var vehicle = _mapper.Map<VehicleModel>(vehicleModel);
+            
             await vehicleDbContext.Models.AddAsync(vehicle);
             await vehicleDbContext.SaveChangesAsync();
             return RedirectToAction("AddVehicleModel");
         }
+
 
         [HttpGet]
         public async Task<IActionResult> ViewVehicleModel(int id)
@@ -44,19 +57,22 @@ namespace Vehicle_Database_MVC.Controllers
             if (model != null)
             {
 
-                var viewModel = new UpdateVehicleModelViewModel()
+                var viewModel = new VehicleModel()
                 {
                     Id = model.Id,
                     MakeId = model.MakeId,
                     VehicleName = model.VehicleName,
                     VehicleAbrv = model.VehicleAbrv
                 };
-                return await Task.Run(() => View("ViewVehicleModel", viewModel));
+                var viewModelDto = _mapper.Map<VehicleModelDto>(viewModel);
+                return await Task.Run(() => View("ViewVehicleModel", viewModelDto));
             }
             return RedirectToAction("IndexVehicleModel");
         }
+
+ 
         [HttpPost]
-        public async Task<IActionResult> ViewVehicleModel(UpdateVehicleModelViewModel model)
+        public async Task<IActionResult> ViewVehicleModel(VehicleModelDto model)
         {
             var vehicleModel = await vehicleDbContext.Models.FindAsync(model.Id);
             if (vehicleModel != null)
@@ -69,7 +85,7 @@ namespace Vehicle_Database_MVC.Controllers
             return RedirectToAction("IndexVehicleModel");
         }
         [HttpPost]
-        public async Task<IActionResult> Delete(UpdateVehicleModelViewModel model)
+        public async Task<IActionResult> Delete(VehicleModelDto model)
         {
             var vehicleModel = await vehicleDbContext.Models.FindAsync(model.Id);
             if (vehicleModel != null)

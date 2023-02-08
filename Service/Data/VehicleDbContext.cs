@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Vehicle_Database_MVC.Models.Domain;
 
+
 namespace Vehicle_Database_MVC.Data
 {
     public class VehicleDbContext : DbContext
