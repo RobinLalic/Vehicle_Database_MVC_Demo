@@ -10,17 +10,19 @@ namespace Vehicle_Database_MVC.Helper
     {
         public AutoMappingProfile()
         {
-            CreateMap<VehicleMake, VehicleMakeDto>()
-                .ForMember(vm => vm.Id, o => o.MapFrom(src => src.Id))
-                .ForMember(vm => vm.VehicleName, o => o.MapFrom(src => src.VehicleName))
-                .ForMember(vm => vm.VehicleAbrv, o => o.MapFrom(src => src.VehicleAbrv))
-                .ReverseMap();
-            CreateMap<VehicleModel, VehicleModelDto>()
-              .ForMember(vm => vm.Id, o => o.MapFrom(src => src.Id))
-              .ForMember(vm => vm.MakeId, o => o.MapFrom(src => src.MakeId))
-              .ForMember(vm => vm.VehicleName, o => o.MapFrom(src => src.VehicleName))
-              .ForMember(vm => vm.VehicleAbrv, o => o.MapFrom(src => src.VehicleAbrv))
-              .ReverseMap();
+            CreateMap<VehicleMake, VehicleDto>().ReverseMap();
+                  
+            CreateMap<VehicleModel, VehicleDto>().ReverseMap();
+
+            var configurationMake = new MapperConfiguration(cfg =>
+            cfg.CreateProjection<VehicleMake, VehicleDto>()
+            .ForMember(dto => dto.Id, conf => conf.MapFrom(ol => ol.Id)));
+
+            var configurationModel = new MapperConfiguration(cfg =>
+            cfg.CreateProjection<VehicleModel, VehicleDto>()
+            .ForMember(dto => dto.Id, conf => conf.MapFrom(ol => ol.Id))
+            .ForMember(dto=> dto.MakeId, conf=>conf.MapFrom(ol => ol.VehicleMake.Id)));
+            
         }
     }
 }

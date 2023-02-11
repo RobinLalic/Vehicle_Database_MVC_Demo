@@ -6,6 +6,10 @@ using Vehicle_Database_MVC.Data;
 using Vehicle_Database_MVC.Models;
 using Vehicle_Database_MVC.Models.Domain;
 using Service;
+using Microsoft.Extensions.Configuration;
+using AutoMapper.QueryableExtensions;
+using Vehicle_Database_MVC.Helper;
+
 
 namespace Vehicle_Database_MVC.Controllers
 {
@@ -25,31 +29,34 @@ namespace Vehicle_Database_MVC.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
        
-        { 
+        {
+
             var makes = await vehicleDbContext.Makes.ToListAsync();
-            var makesDto = new List<VehicleMakeDto>();
+            var makesDto = new List<VehicleDto>();
 
             if (makes.Any())
             {
                 foreach (var make in makes)
                 {
                     var vehicleMake =
-                      _mapper.Map<VehicleMake, VehicleMakeDto>(make);
+                      _mapper.Map<VehicleMake, VehicleDto>(make);
                     makesDto.Add(vehicleMake);
                 }
             }
-
             return View(makesDto);
 
         }
+
+
+
         public IActionResult Add()
         {
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> Add(VehicleMakeDto vehicleMake)
+        public async Task<IActionResult> Add(VehicleDto vehicleMakeDto)
         {
-            var vehicle = _mapper.Map<VehicleMake>(vehicleMake);
+            var vehicle = _mapper.Map<VehicleMake>(vehicleMakeDto);
     
             await vehicleDbContext.Makes.AddAsync(vehicle);
             await vehicleDbContext.SaveChangesAsync();
@@ -68,13 +75,13 @@ namespace Vehicle_Database_MVC.Controllers
                     VehicleName = make.VehicleName,
                     VehicleAbrv = make.VehicleAbrv
                 };
-                var viewmodelDto = _mapper.Map<VehicleMakeDto>(viewModel);
+                var viewmodelDto = _mapper.Map<VehicleDto>(viewModel);
                 return await Task.Run(() => View("View", viewmodelDto));
             }
             return RedirectToAction("Index");
         }
         [HttpPost]
-        public async Task<IActionResult> View(VehicleMakeDto model)
+        public async Task<IActionResult> View(VehicleDto model)
         {
             var vehicleMake = await vehicleDbContext.Makes.FindAsync(model.Id);
             if (vehicleMake != null)
@@ -87,7 +94,7 @@ namespace Vehicle_Database_MVC.Controllers
             return RedirectToAction("Index");
         }
         [HttpPost]
-        public async Task<IActionResult> Delete(VehicleMakeDto model)
+        public async Task<IActionResult> Delete(VehicleDto model)
         {
             var vehicleMake = await vehicleDbContext.Makes.FindAsync(model.Id);
             if (vehicleMake != null)

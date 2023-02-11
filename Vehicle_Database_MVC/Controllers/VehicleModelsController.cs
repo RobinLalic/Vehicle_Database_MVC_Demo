@@ -23,13 +23,13 @@ namespace Vehicle_Database_MVC.Controllers
         public async Task<IActionResult> IndexVehicleModel()
         {
             var models = await vehicleDbContext.Models.ToListAsync();
-            var modelsDto = new List<VehicleModelDto>();
+            var modelsDto = new List<VehicleDto>();
             if (models.Any())
             {
                 foreach (var model in models)
                 {
                     var vehicleModel =
-                      _mapper.Map<VehicleModel, VehicleModelDto>(model);
+                      _mapper.Map<VehicleModel, VehicleDto>(model);
                     modelsDto.Add(vehicleModel);
                 }
             }
@@ -40,7 +40,7 @@ namespace Vehicle_Database_MVC.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> AddVehicleModel(VehicleModelDto vehicleModel)
+        public async Task<IActionResult> AddVehicleModel(VehicleDto vehicleModel)
         {
             var vehicle = _mapper.Map<VehicleModel>(vehicleModel);
             
@@ -64,7 +64,7 @@ namespace Vehicle_Database_MVC.Controllers
                     VehicleName = model.VehicleName,
                     VehicleAbrv = model.VehicleAbrv
                 };
-                var viewModelDto = _mapper.Map<VehicleModelDto>(viewModel);
+                var viewModelDto = _mapper.Map<VehicleDto>(viewModel);
                 return await Task.Run(() => View("ViewVehicleModel", viewModelDto));
             }
             return RedirectToAction("IndexVehicleModel");
@@ -72,7 +72,7 @@ namespace Vehicle_Database_MVC.Controllers
 
  
         [HttpPost]
-        public async Task<IActionResult> ViewVehicleModel(VehicleModelDto model)
+        public async Task<IActionResult> ViewVehicleModel(VehicleDto model)
         {
             var vehicleModel = await vehicleDbContext.Models.FindAsync(model.Id);
             if (vehicleModel != null)
@@ -85,7 +85,7 @@ namespace Vehicle_Database_MVC.Controllers
             return RedirectToAction("IndexVehicleModel");
         }
         [HttpPost]
-        public async Task<IActionResult> Delete(VehicleModelDto model)
+        public async Task<IActionResult> Delete(VehicleDto model)
         {
             var vehicleModel = await vehicleDbContext.Models.FindAsync(model.Id);
             if (vehicleModel != null)
